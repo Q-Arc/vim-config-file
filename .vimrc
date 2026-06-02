@@ -1,56 +1,61 @@
-" --- Mapleader ---
-let mapleader = " "            " Set Spacebar as the mapleader shortcut prefix
+" --- Basics ---
+set nocompatible
+let mapleader = " "
 
-" --- Vim-Plug ---
-call plug#begin('~/.vim/plugged')
-
-Plug 'vimwiki/vimwiki'
-Plug 'junegunn/fzf.vim'
-
-call plug#end()
+filetype plugin indent on
+syntax on
 
 " --- General Quality of Life ---
-set nocompatible            " Disable compatibility with old Vi (essential)
-set number                  " Show line numbers
-set mouse=a                 " Enable mouse support for scrolling/clicking
-set clipboard=unnamedplus   " Share clipboard with the system
+set number
+set mouse=a
+set clipboard=unnamedplus
+set backspace=indent,eol,start
+set wildmenu
+set showcmd
+set laststatus=2
+set noshowmode
 
 " --- Search Settings ---
-set hlsearch                " Highlight search results
-set incsearch               " Search as you type
-set ignorecase              " Ignore case when searching...
-set smartcase               " ...unless search contains a capital letter
+set hlsearch
+set incsearch
+set ignorecase
+set smartcase
 nnoremap <leader><space> :nohlsearch<CR>
-" Tap Spacebar twice to clear highlights!
 
-" --- Indentation & Tabs (Crucial for config files) ---
-set expandtab               " Convert tabs to spaces
-set tabstop=4               " Insert 4 spaces for a tab
-set shiftwidth=4            " Number of spaces for auto-indenting
-set autoindent              " Copy indent from current line on newline
-
-" --- UI & Extras ---
-syntax on                   " Enable syntax highlighting
-set wildmenu                " Visual autocomplete menu for command mode
-set backspace=indent,eol,start " Make backspace work like a normal text editor
+" --- Indentation & Tabs ---
+set expandtab
+set tabstop=4
+set shiftwidth=4
+set autoindent
 
 " --- Hybrid Line Numbers ---
-set number                  " Show the absolute line number for the current line
-set relativenumber          " Show distance to other lines in the gutter
+set relativenumber
 
 " --- Visualizing Hidden Traps ---
-set list                    " Reveal invisible characters
-set listchars=tab:▸\ ,trail:•,extends:»,precedes:« " Tailor what those look like
+set list
+set listchars=tab:▸\ ,trail:•,extends:»,precedes:«
 
 " --- Structural Navigation & Context ---
-set cursorline              " Highlight the current line text is on
-set scrolloff=7             " Keep 7 lines of context visible above/below cursor
-set wrap                    " Wrap visually long strings...
-set linebreak               " ...but break them cleanly at words, not mid-syllable
+set cursorline
+set scrolloff=7
+set wrap
+set linebreak
 
 " --- Better Navigation ---
 nnoremap j gj
 nnoremap k gk
+
+" --- Undo breaks on punctuation ---
+inoremap , ,<c-g>u
+inoremap . .<c-g>u
+inoremap ! !<c-g>u
+inoremap ? ?<c-g>u
+
+" --- Centralize backup and swap file ---
+set backupdir=~/.vim/backup//
+set directory=~/.vim/swap//
+set undodir=~/.vim/undo//
+set undofile
 
 " --- YAML ---
 autocmd FileType yaml,yml setlocal ts=2 sw=2
@@ -61,18 +66,7 @@ augroup BW_AutoCreateDir
   autocmd BufWritePre * if expand("<afile>") !~ '://' | call mkdir(expand("<afile>:p:h"), "p") | endif
 augroup END
 
-" --- Centralize backup and swap file ---
-set backupdir=~/.vim/backup//
-set directory=~/.vim/swap//
-set undodir=~/.vim/undo//
-set undofile
-
 " --- Statusline Customization ---
-set laststatus=2            " Always show the statusline
-set showcmd                 " Show incomplete commands in the bottom right
-set noshowmode              " Hide the default '-- INSERT --' text
-
-" --- Statusline ---
 let &statusline = '%#StatusLineMode# %{StatuslineMode()} '
 let &statusline .= '%#StatusLineFile# %f '
 let &statusline .= '%#StatusLineModified#%m'
@@ -82,7 +76,6 @@ let &statusline .= '%#StatusLineFormat# %{&ff} '
 let &statusline .= '%#StatusLinePos# %l/%L :%c '
 let &statusline .= ' %p%% '
 
-" --- Helper function to get a clean mode name ---
 function! StatuslineMode()
     let l:mode = mode()
     if l:mode==#"n"  | return "NORMAL" | endif
@@ -95,29 +88,43 @@ function! StatuslineMode()
     return l:mode
 endfunction
 
-" Basic colors for the statusline blocks (Works well with dark themes)
-highlight StatusLineMode     ctermfg=0 ctermbg=4 guifg=#000000 guibg=#6699cc
-highlight StatusLineFile     ctermfg=7 ctermbg=8 guifg=#ffffff guibg=#333333
-highlight StatusLineModified ctermfg=1 ctermbg=8 guifg=#ff3333 guibg=#333333
-highlight StatusLineFormat   ctermfg=7 ctermbg=8 guifg=#cccccc guibg=#333333
-highlight StatusLinePos      ctermfg=0 ctermbg=7 guifg=#000000 guibg=#cccccc
+highlight StatusLineMode      ctermfg=0 ctermbg=4 guifg=#000000 guibg=#6699cc
+highlight StatusLineFile      ctermfg=7 ctermbg=8 guifg=#ffffff guibg=#333333
+highlight StatusLineModified   ctermfg=1 ctermbg=8 guifg=#ff3333 guibg=#333333
+highlight StatusLineFormat    ctermfg=7 ctermbg=8 guifg=#cccccc guibg=#333333
+highlight StatusLinePos       ctermfg=0 ctermbg=7 guifg=#000000 guibg=#cccccc
 
-" --- Prose Utilities (No Plugins) ---
-set spelllang=en_gb             " Set spelling language to British English
-set dictionary=/usr/share/dict/words " Use the system dictionary for completion
-set complete+=kspell            " Allow Ctrl+N autocomplete to suggest dictionary words
-nnoremap <leader>s :setlocal spell!<CR>
-" Space + s to toggle spell check
+" --- Prose Utilities ---
+set spelllang=en_gb
+set dictionary=/usr/share/dict/words
+set complete+=kspell
+nnoremap <leader>s :set spell!<CR>
 
-" --- Clean paragraph formatting shortcuts ---
-nnoremap Q gqap
-vnoremap Q gq
+function! s:EnableProseMode() abort
+  setlocal spell
+  setlocal wrap
+  setlocal linebreak
+  setlocal nolist
+  setlocal textwidth=80
+  setlocal formatoptions+=t
+endfunction
 
-" --- Undo breaks on punctuation (makes undo behavior normal) ---
-inoremap , ,<c-g>u
-inoremap . .<c-g>u
-inoremap ! !<c-g>u
-inoremap ? ?<c-g>u
+function! s:DisableProseMode() abort
+  setlocal nospell
+  setlocal wrap
+  setlocal linebreak
+  setlocal list
+  setlocal textwidth=0
+  setlocal formatoptions-=t
+endfunction
+
+augroup ProseWriting
+  autocmd!
+  autocmd BufRead,BufNewFile *.md,*.markdown setfiletype markdown
+  autocmd BufRead,BufNewFile *.txt setfiletype text
+  autocmd FileType markdown,text call s:EnableProseMode()
+  autocmd BufWinLeave *.md,*.markdown,*.txt call s:DisableProseMode()
+augroup END
 
 " --- Vimwiki Settings ---
 let g:vimwiki_list = [{
@@ -126,15 +133,6 @@ let g:vimwiki_list = [{
   \ 'ext': '.md',
   \ }]
 
-" Stop Vimwiki from treating every single markdown file on your system as a wiki file
 let g:vimwiki_global_ext = 0
-" Quick search across all your wiki notes using Space + f
 nnoremap <leader>f :Files ~/vimwiki<CR>
-" Quick full-text search inside all your notes using Space + g (requires 'ripgrep' on your system)
 nnoremap <leader>g :Rg<CR>
-
-" --- Prose & Writing Mode Optimization ---
-augroup ProseWriting
-  autocmd!
-  autocmd FileType markdown,text setlocal nolist
-augroup END
