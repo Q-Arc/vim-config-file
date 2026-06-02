@@ -1,6 +1,6 @@
-# My Minimal, No-Plugin Vim Config
+# My Minimal, Vim Config
 
-A lightweight, vanilla `~/.vimrc` optimized for configuration editing (YAML/Sysadmin) and fluid prose writing (Markdown).
+A lightweight, vanilla `~/.vimrc` optimized for configuration editing and fluid prose writing.
 
 ## Custom Shortcuts
 * `Space` + `s` -> Toggle British English spellcheck
@@ -16,6 +16,4 @@ mkdir -p ~/.vim/{backup,swap,undo}
 
 mkdir ~/vimwiki
 
-Remember to run 
-
-:PlugInstall
+Remember to check home-manager. ~/.config/home-manager/home.nix for plugin stuff when use.
